@@ -1,0 +1,8 @@
+--atlas -f rgba8888 -z auto
+grid.png
+x.png
+x_red.png
+o.png
+o_blue.png
+message.png
+arrow.png
