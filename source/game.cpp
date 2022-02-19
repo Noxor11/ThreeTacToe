@@ -95,11 +95,11 @@ bool Game::placePiece() {
 		placedPieces[placedPiecesCnt] = tmp;
 		placedPiecesCnt++;
 
-		if (gPiecesIndex == 2) {
-			gPiecesIndex = 0;
+		if (gPiecesIndex == 0) {
+			gPiecesIndex = 2;
 		} 
 		else {
-			gPiecesIndex = 2;
+			gPiecesIndex = 0;
 		}
 
 		pieceOnPlay->setPos(WIDTH_CENTER, HEIGHT_CENTER);
@@ -203,6 +203,29 @@ void Game::startLocalGame(u32 kDown) {
 	}
 }
 
+void Game::changeFirstPiece() {
+	Object* tmp = gamePieces[0];
+
+
+	//	Exchange moving Pieces
+	gamePieces[0] = gamePieces[2];
+	gamePieces[2] = tmp;
+
+	//	Exchange static Pieces
+	tmp = gamePieces[1];
+
+	gamePieces[1] = gamePieces[3];
+	gamePieces[3] = tmp;
+
+
+}
+
+void Game::resetMovingPiecePos() {
+	xTilesAway = 0;
+	yTilesAway = 0;
+}
+
+
 void Game::nextRound() {
 	for (int i = 0; i < 9; i++)
 		placedPos[i] = 0;
@@ -210,7 +233,11 @@ void Game::nextRound() {
 	for (int i = 0; i < 0; i++)
 		placedPieces[i] = 0;
 
-	isPlayer1Turn = !(isPlayer1Turn);
+
+	isPlayer1First = !(isPlayer1First);
+	isPlayer1Turn = isPlayer1First;
+	changeFirstPiece();
+	resetMovingPiecePos();
 	placedPiecesCnt = 0;
 	gPiecesIndex = 0;
 	pieceOnPlay = gamePieces[0];
@@ -218,8 +245,7 @@ void Game::nextRound() {
 	playerHasNotChosen = 1;
 	placingPosition = 4;
 
-	xTilesAway = 0;
-	yTilesAway = 0;
+	
 
 	countDownNewRound = COUNTDOWN;
 
@@ -310,7 +336,7 @@ Game::Game(Object* _grid, Object* p1Piece, Object* p1SelectedPiece, Object* p2Pi
 
 
 
-
+	isPlayer1First = 1;
 	isPlayer1Turn = 1;
 	placedPiecesCnt = 0;
 	gPiecesIndex = 0;

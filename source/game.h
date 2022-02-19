@@ -20,6 +20,7 @@ class Game {
 	int turnsPlayed = 0;
 	int gameMode = UNSET;
 	bool isPlayer1Turn;
+	bool isPlayer1First;
 
 	int scoreP1 = 0;
 	std::string* scoreP1Arr = new std::string("0");
@@ -59,6 +60,8 @@ class Game {
 	void drawPieceOnPlay();
 	void showScore();
 	void drawGameMenu();
+	void changeFirstPiece();
+	void resetMovingPiecePos();
 
 
 public:
@@ -66,7 +69,6 @@ public:
 	void userInput(C2D_SpriteSheet* spriteSheet);
 
 	void playerMove(u32 kDown);
-
 	void chooseMode();
 	void startLocalGame(u32 kDown);
 	int gameOver();
