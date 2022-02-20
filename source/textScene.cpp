@@ -2,9 +2,12 @@
 
 
 C2D_TextBuf g_staticBuf;
-C2D_Text g_staticText[4];
-C2D_Text numberText[10];
+std::array<C2D_Text, 4> g_staticText;
+std::array<C2D_Text, 10> numberText;
 C2D_Font font;
+
+#define PLAYER1_TEXT_Y_POS HEIGHT_CENTER + 20
+#define PLAYER2_TEXT_Y_POS PLAYER1_TEXT_Y_POS + 40
 
 
 namespace textScene{
@@ -36,22 +39,14 @@ namespace textScene{
 
 
 		// Optimize the text strings
-		C2D_TextOptimize(&g_staticText[0]);
-		C2D_TextOptimize(&g_staticText[1]);
-		C2D_TextOptimize(&g_staticText[2]);
-		C2D_TextOptimize(&g_staticText[3]);
+		for(C2D_Text txt: g_staticText){
+			C2D_TextOptimize(&txt);
+		}
 
 
-		C2D_TextOptimize(&numberText[0]);
-		C2D_TextOptimize(&numberText[1]);
-		C2D_TextOptimize(&numberText[2]);
-		C2D_TextOptimize(&numberText[3]);
-		C2D_TextOptimize(&numberText[4]);
-		C2D_TextOptimize(&numberText[5]);
-		C2D_TextOptimize(&numberText[6]);
-		C2D_TextOptimize(&numberText[7]);
-		C2D_TextOptimize(&numberText[8]);
-		C2D_TextOptimize(&numberText[9]);
+		for(C2D_Text txt: numberText){
+			C2D_TextOptimize(&txt);
+		}
 	}
 
 	void drawMenu(float size)
@@ -67,21 +62,23 @@ namespace textScene{
 	{
 		
 		// First Player
-		C2D_DrawText(&g_staticText[2], 0, 50, HEIGHT_CENTER - 30, 0.5f, size, size);
+		C2D_DrawText(&g_staticText[2], 0, 50, PLAYER1_TEXT_Y_POS, 0.5f, size, size);
 
+		//	For every char in the score, convert to int and display it
 		for(int i = 0, xPos = 240; i < (int) score1Arr.length(); i++, xPos += 20){
 			int p1 = score1Arr[i] - '0';
-				C2D_DrawText(&numberText[p1], 0, xPos, HEIGHT_CENTER - 30, 0.5f, size, size);
+				C2D_DrawText(&numberText[p1], 0, xPos, PLAYER1_TEXT_Y_POS, 0.5f, size, size);
 
 		}
 
 		
 		// Second Player
-		C2D_DrawText(&g_staticText[3], 0, 50, HEIGHT_CENTER + 10, 0.5f, size, size);
+		C2D_DrawText(&g_staticText[3], 0, 50, PLAYER2_TEXT_Y_POS, 0.5f, size, size);
 
+		//	For every char in the score, convert to int and display it
 		for (int i = 0, xPos = 240; i < (int)score2Arr.length(); i++, xPos += 20) {
 			int p2 = score2Arr[i] - '0';
-			C2D_DrawText(&numberText[p2], 0, xPos, HEIGHT_CENTER + 10, 0.5f, size, size);
+			C2D_DrawText(&numberText[p2], 0, xPos, PLAYER2_TEXT_Y_POS, 0.5f, size, size);
 
 		}
 

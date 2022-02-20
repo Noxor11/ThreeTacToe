@@ -10,6 +10,8 @@
 #include <citro2d.h>
 #include <3ds.h>
 #include <string>
+#include <array>
+
 
 #define MAX_SPRITES			768
 #define SCREEN_WIDTH		400

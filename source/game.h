@@ -3,6 +3,8 @@
 #include "textScene.h"
 #include "gameGraphics.h"
 #include <string>
+#include <array>
+
 
 #define COUNTDOWN	100
 #define UNSET		-1
@@ -14,8 +16,8 @@
 
 class Game {
 
+	std::array<int, 9> placedPos = {};
 	int placedPiecesCnt;
-	int placedPos[9] = {};
 	int placingPosition;
 	int turnsPlayed;
 	int gameMode = UNSET;
@@ -42,7 +44,7 @@ class Game {
 
 	u32 kDown;
 
-	bool isTie();
+	int isTie();
 	bool placePiece();
 	bool isPlaceFree();
 	void nextTurn();
@@ -58,6 +60,7 @@ class Game {
 	void moveCursorDown();
 	void moveCursorLeft();
 	void moveCursorRight();
+	void checkForMovement();
 
 
 public:
@@ -69,7 +72,7 @@ public:
 	void addPointsTo(int Player);
 	void setScreens(C3D_RenderTarget* top, C3D_RenderTarget* bot);
 
-	int gameOver();
+	int playerScoresPoint();
 
 	Game(GameGraphics* gfx_);
 };

@@ -5,6 +5,11 @@
 
 #define PLAYER1	1
 #define PLAYER2	2
+
+#define PLACED		1
+#define	NOT_PLACED	0
+
+
 float textSize = 1.0f;
 
 
@@ -12,29 +17,33 @@ float textSize = 1.0f;
 
 
 void Game::playerMove(u32 kDown ) {
-	if (playerHasNotChosen) {
-		if (kDown & KEY_UP && yTilesAway < 1) {
-			
-			moveCursorUp();
-			
-		}
+	if (playerHasNotChosen) 
+		checkForMovement();
+	
+	else 
+		nextTurn();
+}
 
-		if (kDown & KEY_DOWN && yTilesAway > -1) {
-			moveCursorDown();
-			
-		}
 
-		if (kDown & KEY_RIGHT && xTilesAway < 1) {
-			moveCursorRight();
-			
-		}
+bool Game::isPlaceFree() {
+	//	Return wether that pos has a score
+	return placedPos[placingPosition] == 0;
+}
 
-		if (kDown & KEY_LEFT && xTilesAway > -1) {
-			moveCursorLeft();
-			
-		}
+void Game::checkForMovement(){
+	if (kDown & KEY_UP && yTilesAway < 1) 
+		moveCursorUp();
 
-		if (kDown & KEY_A) {	//	Place if there's not another piece below
+	if (kDown & KEY_DOWN && yTilesAway > -1)
+		moveCursorDown();
+
+	if (kDown & KEY_RIGHT && xTilesAway < 1) 
+		moveCursorRight();
+
+	if (kDown & KEY_LEFT && xTilesAway > -1) 
+		moveCursorLeft();		
+
+	if (kDown & KEY_A) {	//	Place if there's not another piece below
 			if (placePiece()) {
 
 				//	Piece to place belongs to...
@@ -46,19 +55,7 @@ void Game::playerMove(u32 kDown ) {
 				playerHasNotChosen = 0;
 			}
 		}
-	}
-	else {
-		nextTurn();
-	}
 }
-
-
-bool Game::isPlaceFree() {
-	//	Return wether that pos has a score
-	return placedPos[placingPosition] == 0;
-}
-
-
 
 
 void Game::drawPlacedPieces() {
@@ -83,15 +80,10 @@ void Game::resetMovingPiecePos() {
 
 bool Game::placePiece() {
 
-	if (isPlaceFree()) {
-
-		
+	if (isPlaceFree()) {		
 		placedPiecesCnt++;
-
 		gfx->placePiece();
-
-		
-		
+				
 		return 1;
 	}
 	else {
@@ -110,9 +102,11 @@ void Game::nextTurn() {
 	turnsPlayed++;
 }
 
-bool Game::isTie() {
+int Game::isTie() {
 	if (turnsPlayed == 9)
 		return TIE;
+	
+
 	return 0;
 }
 
@@ -179,7 +173,7 @@ void Game::startLocalGame(u32 kDown) {
 	gfx->drawGrid();
 	drawPlacedPieces();
 
-	if (!gameOver() ) {
+	if (!playerScoresPoint() ) {
 		drawPieceOnPlay();
 		playerMove(kDown);
 
@@ -189,17 +183,17 @@ void Game::startLocalGame(u32 kDown) {
 			printf("\x1b[12;7HLa vieja won!");
 		}
 		else {
-			printf("\x1b[12;7HPlayer %d Won!", gameOver());
+			printf("\x1b[12;7HPlayer %d Won!", playerScoresPoint());
 		}
 
 
 		
 		if(countDownNewRound-- < 0){
 
-			if (gameOver() == 1)
+			if (playerScoresPoint() == PLAYER1)
 				addPointsTo(PLAYER1);
 
-			else if(gameOver() == 2)
+			else if(playerScoresPoint() == PLAYER2)
 				addPointsTo(PLAYER2);
 
 			nextRound();
@@ -242,7 +236,7 @@ void Game::nextRound() {
 	gfx->prepareNextRound();
 }
 
-int Game::gameOver() {
+int Game::playerScoresPoint() {
 
 
 	//	Horizontal Check
