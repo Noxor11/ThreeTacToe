@@ -29,8 +29,8 @@ int main(int argc, char* argv[]) {
 	//---------------------------------------------------------------------------------
 
 
-	initScene();
-	initTextScene();
+	gameScene::initScene();
+	textScene::initTextScene();
 	
 	
 
@@ -57,7 +57,11 @@ int main(int argc, char* argv[]) {
 	arrow->setPos(70, HEIGHT_CENTER - 15);
 
 	
-	Game gm(grid, x, xRed, o, oBlue, arrow);
+	GameGraphics* gfx = new GameGraphics(grid, x, xRed, o, oBlue, arrow);
+
+	
+
+	Game gm(gfx);
 
 	gm.setScreens(top, bot);
 
@@ -76,12 +80,12 @@ int main(int argc, char* argv[]) {
 	}
 
 	// Deinitialize the scene
-	exitTextScene();
+	textScene::exitTextScene();
 	cfguExit();
 
 
 	// De-init libs and sprites
-	stopScene(&spriteSheet);
+	gameScene::stopScene(&spriteSheet);
 
 	return 0;
 }

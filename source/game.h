@@ -1,6 +1,7 @@
 #pragma once
 #include "gameObjects.h"
 #include "textScene.h"
+#include "gameGraphics.h"
 #include <string>
 
 #define COUNTDOWN	100
@@ -13,77 +14,62 @@
 
 class Game {
 
-	int gPiecesIndex;
 	int placedPiecesCnt;
 	int placedPos[9] = {};
 	int placingPosition;
-	int turnsPlayed = 0;
+	int turnsPlayed;
 	int gameMode = UNSET;
 	bool isPlayer1Turn;
 	bool isPlayer1First;
 
-	int scoreP1 = 0;
-	std::string* scoreP1Arr = new std::string("0");
+	int scoreP1;
+	std::string* scoreP1Arr;
 
-	int scoreP2 = 0;
-	std::string* scoreP2Arr = new std::string("0");
+	int scoreP2;
+	std::string* scoreP2Arr;
 
 
-	bool playerHasNotChosen = 1;
+	bool playerHasNotChosen;
+	int xTilesAway;
+	int yTilesAway;
 
-	int xTilesAway = 0;
-	int yTilesAway = 0;
+
 
 	int countDownNewRound = COUNTDOWN;
 
-	Object* grid;
-	Object* gamePieces[4] = {};
-	Object* placedPieces[9] = {};
-	Object* arrow;
-
-
-	Object* pieceOnPlay;
-
-
-	C3D_RenderTarget* topScreen;
-	C3D_RenderTarget* bottomScreen;
+	GameGraphics* gfx;
 
 
 	u32 kDown;
 
 	bool isTie();
+	bool placePiece();
 	bool isPlaceFree();
 	void nextTurn();
 	void nextRound();
-	bool placePiece();
+	void resetMovingPiecePos();
 	void drawPlacedPieces();
 	void drawPieceOnPlay();
 	void showScore();
 	void drawGameMenu();
-	void changeFirstPiece();
-	void resetMovingPiecePos();
+	void selectMode(int mode);
+	void confirmSelect();
+	void moveCursorUp();
+	void moveCursorDown();
+	void moveCursorLeft();
+	void moveCursorRight();
 
 
 public:
-
 	void userInput(C2D_SpriteSheet* spriteSheet);
-
 	void playerMove(u32 kDown);
 	void chooseMode();
 	void startLocalGame(u32 kDown);
-	int gameOver();
 	void playAgain();
-	void addPointsTo(int& playerScore, std::string* scoreArr);
+	void addPointsTo(int Player);
+	void setScreens(C3D_RenderTarget* top, C3D_RenderTarget* bot);
 
-	void setScreens(C3D_RenderTarget* tScreen, C3D_RenderTarget* botScreen);
+	int gameOver();
 
-
-	Game(Object* grid, Object* p1Piece, Object* p1SelectedPiece, Object* p2Piece, Object* p2SelectedPiece, Object* arrow);
-};
-
-
-struct Player {
-	Object* piece;
-	Player(Object* pi);
-	Player();
+	Game(GameGraphics* gfx_);
 };

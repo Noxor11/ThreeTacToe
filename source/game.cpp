@@ -1,9 +1,10 @@
 #include "game.h"
 #include "scene.h"
-#include "textScene.h"
 #include <iostream>
 
 
+#define PLAYER1	1
+#define PLAYER2	2
 float textSize = 1.0f;
 
 
@@ -13,35 +14,34 @@ float textSize = 1.0f;
 void Game::playerMove(u32 kDown ) {
 	if (playerHasNotChosen) {
 		if (kDown & KEY_UP && yTilesAway < 1) {
-			pieceOnPlay->moveYBy(66);
-			placingPosition -= 3;
-			yTilesAway++;
+			
+			moveCursorUp();
+			
 		}
 
 		if (kDown & KEY_DOWN && yTilesAway > -1) {
-			pieceOnPlay->moveYBy(-66);
-			placingPosition += 3;
-			yTilesAway--;
+			moveCursorDown();
+			
 		}
 
 		if (kDown & KEY_RIGHT && xTilesAway < 1) {
-			pieceOnPlay->moveXBy(66);
-			placingPosition++;
-			xTilesAway++;
+			moveCursorRight();
+			
 		}
 
 		if (kDown & KEY_LEFT && xTilesAway > -1) {
-			pieceOnPlay->moveXBy(-66);
-			placingPosition--;
-			xTilesAway--;
+			moveCursorLeft();
+			
 		}
 
 		if (kDown & KEY_A) {	//	Place if there's not another piece below
 			if (placePiece()) {
+
+				//	Piece to place belongs to...
 				if (isPlayer1Turn)
-					placedPos[placingPosition] = 1;
+					placedPos[placingPosition] = PLAYER1;
 				else
-					placedPos[placingPosition] = 2;
+					placedPos[placingPosition] = PLAYER2;
 					
 				playerHasNotChosen = 0;
 			}
@@ -49,61 +49,48 @@ void Game::playerMove(u32 kDown ) {
 	}
 	else {
 		nextTurn();
-		xTilesAway = 0;
-		yTilesAway = 0;
-		playerHasNotChosen = 1;
 	}
 }
 
 
 bool Game::isPlaceFree() {
-	for (int i = 0; i < placedPiecesCnt; i++)
-		if(pieceOnPlay->hasSamePosAs(placedPieces[i]))
-			return 0;
-
-	return 1;
+	//	Return wether that pos has a score
+	return placedPos[placingPosition] == 0;
 }
 
 
 
 
 void Game::drawPlacedPieces() {
-	for (int i = 0; i < placedPiecesCnt; i++)
-		draw(placedPieces[i]);
+	gfx->drawPlacedPieces();
 }
 
 void Game::drawPieceOnPlay() {
-	draw(pieceOnPlay);
+	gfx->drawPieceOnPlay();
 }
 
 
 void Game::showScore() {
-	drawScore(textSize, *scoreP1Arr, *scoreP2Arr);
+	textScene::drawScore(textSize, *scoreP1Arr, *scoreP2Arr);
 }
 
+void Game::resetMovingPiecePos() {
+	xTilesAway = 0;
+	yTilesAway = 0;
+
+}
 
 
 bool Game::placePiece() {
 
 	if (isPlaceFree()) {
 
-		gamePieces[gPiecesIndex + 1]->setPos(WIDTH_CENTER, HEIGHT_CENTER);
-
-		Object* tmp = new Object(*gamePieces[gPiecesIndex + 1]);
-		tmp->setPos(pieceOnPlay);
-
-		placedPieces[placedPiecesCnt] = tmp;
+		
 		placedPiecesCnt++;
 
-		if (gPiecesIndex == 0) {
-			gPiecesIndex = 2;
-		} 
-		else {
-			gPiecesIndex = 0;
-		}
+		gfx->placePiece();
 
-		pieceOnPlay->setPos(WIDTH_CENTER, HEIGHT_CENTER);
-		pieceOnPlay = gamePieces[gPiecesIndex];
+		
 		
 		return 1;
 	}
@@ -115,8 +102,11 @@ bool Game::placePiece() {
 }
 
 void Game::nextTurn() {
+	resetMovingPiecePos();
+
 	isPlayer1Turn = !(isPlayer1Turn);
 	placingPosition = 4;
+	playerHasNotChosen = 1;
 	turnsPlayed++;
 }
 
@@ -126,40 +116,58 @@ bool Game::isTie() {
 	return 0;
 }
 
+void Game::moveCursorUp() {
+	gfx->moveCursorUp();
+	placingPosition -= 3;
+	yTilesAway++;
+}
+void Game::moveCursorDown() {
+	gfx->moveCursorDown();
+	placingPosition += 3;
+	yTilesAway--;
+}
+void Game::moveCursorRight() {
+	gfx->moveCursorRight();
+	placingPosition++;
+	xTilesAway++;
+}
+void Game::moveCursorLeft() {
+	gfx->moveCursorLeft();
+	placingPosition--;
+	xTilesAway--;
+}
+
 
 void Game::drawGameMenu() {
-	drawMenu(textSize);
+	gfx->drawMenu(textSize);
 }
 
 void Game::chooseMode() {
-	renderScene(bottomScreen);
+	gfx->renderBotScreen();
 	
 	
 	if (gameMode < 1) {
 		if (kDown & KEY_UP) {
-
-			arrow->setPos(70, HEIGHT_CENTER - 15);
-			gameMode = -LOCAL_GAME; // not selected
+			selectMode(LOCAL_GAME);
 		}
 
 		if (kDown & KEY_DOWN) {
-			arrow->setPos(70, HEIGHT_CENTER + 15);
-			gameMode = -ONLINE_GAME; //	not selected
+			selectMode(ONLINE_GAME);
 		}
 
 		if (kDown & KEY_A) {
-			gameMode *= -1;	//	select game by making it positive
+			confirmSelect();
 		}
 
-		draw(arrow);
-		drawMenu(textSize);
+		gfx->drawArrow();
+		gfx->drawMenu(textSize);
 
 		
 
 	}
 	else if (gameMode == LOCAL_GAME) {
 		showScore();
-		renderScene(topScreen);
+		gfx->renderTopScreen();
 		startLocalGame(kDown);
 
 	}
@@ -168,7 +176,7 @@ void Game::chooseMode() {
 
 void Game::startLocalGame(u32 kDown) {
 
-	draw(grid);
+	gfx->drawGrid();
 	drawPlacedPieces();
 
 	if (!gameOver() ) {
@@ -179,13 +187,9 @@ void Game::startLocalGame(u32 kDown) {
 	else {
 		if (isTie()) {
 			printf("\x1b[12;7HLa vieja won!");
-			
 		}
 		else {
-
 			printf("\x1b[12;7HPlayer %d Won!", gameOver());
-
-
 		}
 
 
@@ -193,9 +197,10 @@ void Game::startLocalGame(u32 kDown) {
 		if(countDownNewRound-- < 0){
 
 			if (gameOver() == 1)
-				addPointsTo(scoreP1, scoreP1Arr);
+				addPointsTo(PLAYER1);
+
 			else if(gameOver() == 2)
-				addPointsTo(scoreP2, scoreP2Arr);
+				addPointsTo(PLAYER2);
 
 			nextRound();
 		}
@@ -203,53 +208,38 @@ void Game::startLocalGame(u32 kDown) {
 	}
 }
 
-void Game::changeFirstPiece() {
-	Object* tmp = gamePieces[0];
-
-
-	//	Exchange moving Pieces
-	gamePieces[0] = gamePieces[2];
-	gamePieces[2] = tmp;
-
-	//	Exchange static Pieces
-	tmp = gamePieces[1];
-
-	gamePieces[1] = gamePieces[3];
-	gamePieces[3] = tmp;
-
+void Game::selectMode(int mode) {
+	gfx->selectMode(mode);
+	gameMode = -mode;
 
 }
 
-void Game::resetMovingPiecePos() {
-	xTilesAway = 0;
-	yTilesAway = 0;
+void Game::confirmSelect() {
+	gameMode *= -1;	//	select game by making it positive
 }
+
+
 
 
 void Game::nextRound() {
+
+	resetMovingPiecePos();
+
+	//	Reset pieces in board
 	for (int i = 0; i < 9; i++)
 		placedPos[i] = 0;
 
-	for (int i = 0; i < 0; i++)
-		placedPieces[i] = 0;
 
 
 	isPlayer1First = !(isPlayer1First);
 	isPlayer1Turn = isPlayer1First;
-	changeFirstPiece();
-	resetMovingPiecePos();
 	placedPiecesCnt = 0;
-	gPiecesIndex = 0;
-	pieceOnPlay = gamePieces[0];
 	turnsPlayed = 0;
 	playerHasNotChosen = 1;
 	placingPosition = 4;
 
-	
-
 	countDownNewRound = COUNTDOWN;
-
-
+	gfx->prepareNextRound();
 }
 
 int Game::gameOver() {
@@ -284,6 +274,8 @@ int Game::gameOver() {
 	if (placedPos[2] != 0 && placedPos[2] == placedPos[4] && placedPos[2] == placedPos[6])
 		return placedPos[2];
 
+
+	//	If no player has gotten three on line, return wether it's a draw or not 
 	return isTie();
 
 }
@@ -291,33 +283,40 @@ int Game::gameOver() {
 
 
 
-void Game::setScreens(C3D_RenderTarget* tScreen, C3D_RenderTarget* botScreen) {
-	topScreen = tScreen;
-	bottomScreen = botScreen;
-}
 
 
-void Game::userInput(C2D_SpriteSheet* spriteSheet) {
+
+void Game::userInput(C2D_SpriteSheet* spriteSheet){
 	// Respond to user input
 	hidScanInput();
 
 	kDown = hidKeysDown();
 	if (kDown & KEY_START) {
-		exitTextScene();
+		textScene::exitTextScene();
 		cfguExit();
 
 
 		// De-init libs and sprites
-		stopScene(spriteSheet);
+		gameScene::stopScene(spriteSheet);
 		exit(0);	// break in order to return to hbmenu
 	}
 
 }
 
-void Game::addPointsTo(int& playerScore, std::string* scoreArr ) {
-	playerScore++;	
-	*scoreArr = *(new std::string(std::to_string(playerScore)));
+void Game::addPointsTo(int Player){
+	if(Player == PLAYER1){
+		scoreP1++;	
+		scoreP1Arr = new std::string(std::to_string(scoreP1));
+	}
+	else if(Player == PLAYER2){
+		scoreP2++;	
+		scoreP2Arr = new std::string(std::to_string(scoreP2));
+	}
 	
+}
+
+void Game::setScreens(C3D_RenderTarget* top, C3D_RenderTarget* bot) {
+	gfx->setScreens(top, bot);
 }
 
 
@@ -327,29 +326,24 @@ void Game::playAgain() {
 }
 
 
-Game::Game(Object* _grid, Object* p1Piece, Object* p1SelectedPiece, Object* p2Piece, Object* p2SelectedPiece, Object* _arrow) {
-	gamePieces[0] = p1Piece;
-	gamePieces[1] = p1SelectedPiece;
-	gamePieces[2] = p2Piece;
-	gamePieces[3] = p2SelectedPiece;
 
 
+Game::Game(GameGraphics* gfx_) {
 
+	this->gfx= gfx_;
+	scoreP1Arr = new std::string("0");
+	scoreP2Arr = new std::string("0");
 
+	scoreP1 = 0;
+	scoreP2 = 0;
+
+	playerHasNotChosen = 1;
+	turnsPlayed = 0;
 	isPlayer1First = 1;
 	isPlayer1Turn = 1;
 	placedPiecesCnt = 0;
-	gPiecesIndex = 0;
 	placingPosition = 4;
-	pieceOnPlay = gamePieces[0];
-	grid = _grid;
-	arrow = _arrow;
+
+	resetMovingPiecePos();
 }
 
-Player::Player(Object* pi) {
-	piece = pi;
-}
-
-Player::Player() {
-	
-}
