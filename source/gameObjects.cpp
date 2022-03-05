@@ -38,6 +38,14 @@ C2D_Sprite* Object::getSprite() {
 	return &spr;
 }
 
+C2D_Image Object::getImage(){
+	return spr.image;
+}
+
+void Object::setImage(C2D_Image img){
+	spr.image = img; 
+}
+
 
 
 void Object::moveXBy(float increment) {
@@ -65,7 +73,13 @@ Object::Object(Object* sprite, C2D_SpriteSheet* spriteSheet, int index, float xP
 	initSpriteAt(spriteSheet, index, xPosition, yPosition);
 }
 
-Object::Object() {
+Object::Object(C2D_Image img) {
+	C2D_SpriteFromImage(&spr, img);
+	C2D_SpriteSetCenter(&spr, 0.5f, 0.5f);
+}
+
+Object::Object(){
+
 }
 
 void Object::initSpriteAt(C2D_SpriteSheet* spriteSheet, int index, float xPosition, float yPosition) {
@@ -77,6 +91,7 @@ void Object::initSpriteAt(C2D_SpriteSheet* spriteSheet, int index, float xPositi
 void Object::initSpriteCenter(C2D_SpriteSheet* spriteSheet, int index) {
 	initSpriteAt(spriteSheet, index, 0, 0);
 }
+
 
 
 void Object::initSpriteBottomCenter(C2D_SpriteSheet* spriteSheet, int index) {

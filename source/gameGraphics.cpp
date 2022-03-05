@@ -27,8 +27,7 @@ void GameGraphics::prepareNextRound() {
 
 
 void GameGraphics::drawPieceOnPlay() {
-	bg->setPos(pieceOnPlay);
-	bg->setPos(bg->px(), bg->py() - 1);
+
 	gameScene::draw(bg);
 	gameScene::draw(pieceOnPlay);
 }
@@ -79,15 +78,20 @@ void GameGraphics::selectMode(int mode) {
 
 void GameGraphics::moveCursorUp() {
 	pieceOnPlay->moveYBy(66);
+	bg->moveYBy(64);
 }
 void GameGraphics::moveCursorDown() {
 	pieceOnPlay->moveYBy(-66);
+	bg->moveYBy(-64);
+
 }
 void GameGraphics::moveCursorLeft() {
 	pieceOnPlay->moveXBy(-66);
+	bg->moveXBy(-64);
 }
 void GameGraphics::moveCursorRight() {
 	pieceOnPlay->moveXBy(66);
+	bg->moveXBy(64);
 }
 
 
@@ -108,6 +112,10 @@ void GameGraphics::placePiece() {
 	}
 
 	pieceOnPlay->setPos(WIDTH_CENTER, HEIGHT_CENTER);
+	
+	bg->setPos(WIDTH_CENTER - 0.5f, HEIGHT_CENTER-1);
+	
+
 	pieceOnPlay = gamePieces[gPiecesIndex];
 }
 
@@ -153,15 +161,15 @@ void GameGraphics::drawTime(int seconds){
 
 void GameGraphics::setPieceBackground(int background){
 	if(background == BACKGROUND_AVAILABLE)
-		bg = bgAvailable;
+		bg->setImage(bgAvailable);
 	else
-		bg = bgNotAvailable;
+		bg->setImage(bgNotAvailable);
 }
 
 
 
 
-GameGraphics::GameGraphics(Object* _grid, Object* p1Piece, Object* p1SelectedPiece, Object* p2Piece, Object* p2SelectedPiece, Object* _arrow, Object* available, Object* not_available) {
+GameGraphics::GameGraphics(Object* _grid, Object* p1Piece, Object* p1SelectedPiece, Object* p2Piece, Object* p2SelectedPiece, Object* _arrow, C2D_Image available, C2D_Image not_available) {
 	gamePieces[0] = p1Piece;
 	gamePieces[1] = p1SelectedPiece;
 	gamePieces[2] = p2Piece;
@@ -178,6 +186,8 @@ GameGraphics::GameGraphics(Object* _grid, Object* p1Piece, Object* p1SelectedPie
 	arrow = _arrow;
 	bgAvailable = available;
 	bgNotAvailable = not_available;
-	bg = bgAvailable;
+	bg = new Object(bgAvailable);
+	bg->setPos(WIDTH_CENTER - 0.5f, HEIGHT_CENTER-1);
+
 
 }

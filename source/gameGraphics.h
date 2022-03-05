@@ -13,8 +13,8 @@ private:
 	Object* gamePieces[4] = {};
 	Object* placedPieces[9] = {};
 	Object* arrow;
-	Object* bgAvailable;
-	Object* bgNotAvailable;
+	C2D_Image bgAvailable;
+	C2D_Image bgNotAvailable;
 	Object* bg;
 
 
@@ -67,5 +67,5 @@ public:
 
 
 
-	GameGraphics(Object* grid, Object* p1Piece, Object* p1SelectedPiece, Object* p2Piece, Object* p2SelectedPiece, Object* arrow, Object* available, Object* not_available);
+	GameGraphics(Object* grid, Object* p1Piece, Object* p1SelectedPiece, Object* p2Piece, Object* p2SelectedPiece, Object* arrow, C2D_Image available, C2D_Image not_available);
 };

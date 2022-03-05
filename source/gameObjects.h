@@ -23,6 +23,7 @@
 
 
 class Object {
+	
 	C2D_Sprite spr;
 
 public:
@@ -36,8 +37,10 @@ public:
 	void moveXBy(float increment);
 	void moveYBy(float increment);
 	void moveBy(float xIncrement, float yIncrement);
+	void setImage(C2D_Image img);
 
 
+	C2D_Image getImage();
 	C2D_Sprite* getSprite();
 	void initSpriteCenter(C2D_SpriteSheet* spriteSheet, int index);
 	void initSpriteBottomCenter(C2D_SpriteSheet* spriteSheet, int index);
@@ -45,6 +48,7 @@ public:
 
 	Object(Object* sprite, C2D_SpriteSheet* spriteSheet, int index);
 	Object(Object* sprite, C2D_SpriteSheet* spriteSheet, int index, float xPosition, float yPosition);
+	Object(C2D_Image img);
 	Object();
 
 };

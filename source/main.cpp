@@ -61,8 +61,11 @@ int main(int argc, char* argv[]) {
 
 	Object* available	= new Object(sprites, &spriteSheet, 7);
 	Object* n_available	= new Object(sprites, &spriteSheet, 8);
+
+	C2D_Image av = available->getImage();
+	C2D_Image n_av = n_available->getImage();
 	
-	GameGraphics* gfx = new GameGraphics(grid, x, xRed, o, oBlue, arrow, available, n_available);
+	GameGraphics* gfx = new GameGraphics(grid, x, xRed, o, oBlue, arrow, av, n_av);
 
 	
 
