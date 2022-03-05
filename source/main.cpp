@@ -44,6 +44,8 @@ int main(int argc, char* argv[]) {
 	if (!spriteSheet) svcBreak(USERBREAK_PANIC);
 
 
+
+
 	// Create Sprites from sprite sheet
 	Object* grid		= new Object(sprites, &spriteSheet, 0);
 	Object* x			= new Object(sprites, &spriteSheet, 1);
@@ -51,13 +53,16 @@ int main(int argc, char* argv[]) {
 	Object* o			= new Object(sprites, &spriteSheet, 3);
 	Object* oBlue		= new Object(sprites, &spriteSheet, 4);
 	Object* messageBox	= new Object(sprites, &spriteSheet, 5);
+
 	
 
 	Object* arrow		= new Object(sprites, &spriteSheet, 6, -150, 0);
 	arrow->setPos(70, HEIGHT_CENTER - 15);
 
+	Object* available	= new Object(sprites, &spriteSheet, 7);
+	Object* n_available	= new Object(sprites, &spriteSheet, 8);
 	
-	GameGraphics* gfx = new GameGraphics(grid, x, xRed, o, oBlue, arrow);
+	GameGraphics* gfx = new GameGraphics(grid, x, xRed, o, oBlue, arrow, available, n_available);
 
 	
 
@@ -69,14 +74,18 @@ int main(int argc, char* argv[]) {
 
 
 
-
 	// Main loop
 	while (aptMainLoop()){
+
+		
 
 		gm.userInput(&spriteSheet);
 		gm.chooseMode();
 
 		C3D_FrameEnd(0);
+		
+
+		
 	}
 
 	// Deinitialize the scene

@@ -10,15 +10,17 @@
 #define	NOT_PLACED	0
 
 
-float textSize = 1.0f;
 
 
 
 
 
 void Game::playerMove(u32 kDown ) {
-	if (playerHasNotChosen) 
+
+	if (playerHasNotChosen) {
+
 		checkForMovement();
+	}
 	
 	else 
 		nextTurn();
@@ -43,6 +45,11 @@ void Game::checkForMovement(){
 	if (kDown & KEY_LEFT && xTilesAway > -1) 
 		moveCursorLeft();		
 
+	if(isPlaceFree())
+		gfx->setPieceBackground(BACKGROUND_AVAILABLE);
+	else
+		gfx->setPieceBackground(BACKGROUND_OCCUPIED);
+	
 	if (kDown & KEY_A) {	//	Place if there's not another piece below
 			if (placePiece()) {
 
@@ -68,7 +75,7 @@ void Game::drawPieceOnPlay() {
 
 
 void Game::showScore() {
-	textScene::drawScore(textSize, *scoreP1Arr, *scoreP2Arr);
+	gfx->drawScore();
 }
 
 void Game::resetMovingPiecePos() {
@@ -94,6 +101,8 @@ bool Game::placePiece() {
 }
 
 void Game::nextTurn() {
+
+	timerIsSet = false;
 	resetMovingPiecePos();
 
 	isPlayer1Turn = !(isPlayer1Turn);
@@ -133,7 +142,7 @@ void Game::moveCursorLeft() {
 
 
 void Game::drawGameMenu() {
-	gfx->drawMenu(textSize);
+	gfx->drawMenu();
 }
 
 void Game::chooseMode() {
@@ -154,13 +163,25 @@ void Game::chooseMode() {
 		}
 
 		gfx->drawArrow();
-		gfx->drawMenu(textSize);
+		gfx->drawMenu();
 
 		
 
 	}
 	else if (gameMode == LOCAL_GAME) {
 		showScore();
+		
+		if(!timerIsSet){
+			startTimer();
+		}
+
+		if(secondsToPlay() == 4){
+			timerIsSet = false;
+			startTimer();
+
+		}
+		gfx->drawTime(secondsToPlay());
+
 		gfx->renderTopScreen();
 		startLocalGame(kDown);
 
@@ -210,6 +231,14 @@ void Game::selectMode(int mode) {
 
 void Game::confirmSelect() {
 	gameMode *= -1;	//	select game by making it positive
+}
+
+
+void Game::startTimer(){
+	difference = svcGetSystemTick() / SYSCLOCK_ARM11;
+	timerIsSet = true;
+	
+
 }
 
 
@@ -299,14 +328,20 @@ void Game::userInput(C2D_SpriteSheet* spriteSheet){
 
 void Game::addPointsTo(int Player){
 	if(Player == PLAYER1){
-		scoreP1++;	
-		scoreP1Arr = new std::string(std::to_string(scoreP1));
+		scoreP1++;
+		gfx->setScoreP1(scoreP1);
 	}
 	else if(Player == PLAYER2){
 		scoreP2++;	
-		scoreP2Arr = new std::string(std::to_string(scoreP2));
+		gfx->setScoreP2(scoreP2);
 	}
 	
+}
+
+int Game::secondsToPlay(){
+	return  	(svcGetSystemTick() / SYSCLOCK_ARM11) - difference;
+
+
 }
 
 void Game::setScreens(C3D_RenderTarget* top, C3D_RenderTarget* bot) {
@@ -319,18 +354,18 @@ void Game::playAgain() {
 	
 }
 
-
+void Game::initScore(){
+	gfx->initScore();
+	scoreP1 = 0;
+	scoreP2 = 0;
+}
 
 
 Game::Game(GameGraphics* gfx_) {
 
 	this->gfx= gfx_;
-	scoreP1Arr = new std::string("0");
-	scoreP2Arr = new std::string("0");
-
-	scoreP1 = 0;
-	scoreP2 = 0;
-
+	
+	initScore();
 	playerHasNotChosen = 1;
 	turnsPlayed = 0;
 	isPlayer1First = 1;
@@ -339,5 +374,6 @@ Game::Game(GameGraphics* gfx_) {
 	placingPosition = 4;
 
 	resetMovingPiecePos();
+
 }
 

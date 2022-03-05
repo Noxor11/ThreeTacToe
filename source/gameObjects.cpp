@@ -24,7 +24,8 @@ void Object::setPos(float xPosition, float yPosition) {
 }
 
 void Object::setPos(Object* objectToGetPositionFrom) {
-	spr.params.pos = objectToGetPositionFrom->spr.params.pos;
+	spr.params.pos.x = objectToGetPositionFrom->spr.params.pos.x;
+	spr.params.pos.y = objectToGetPositionFrom->spr.params.pos.y;
 
 }
 

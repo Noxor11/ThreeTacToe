@@ -17,6 +17,12 @@
 class Game {
 
 	std::array<int, 9> placedPos = {};
+
+
+	long difference = 0;
+
+
+
 	int placedPiecesCnt;
 	int placingPosition;
 	int turnsPlayed;
@@ -25,10 +31,7 @@ class Game {
 	bool isPlayer1First;
 
 	int scoreP1;
-	std::string* scoreP1Arr;
-
 	int scoreP2;
-	std::string* scoreP2Arr;
 
 
 	bool playerHasNotChosen;
@@ -40,6 +43,8 @@ class Game {
 	int countDownNewRound = COUNTDOWN;
 
 	GameGraphics* gfx;
+	
+	bool timerIsSet = false;
 
 
 	u32 kDown;
@@ -61,18 +66,19 @@ class Game {
 	void moveCursorLeft();
 	void moveCursorRight();
 	void checkForMovement();
-
-
-public:
-	void userInput(C2D_SpriteSheet* spriteSheet);
+	void initScore();
 	void playerMove(u32 kDown);
-	void chooseMode();
 	void startLocalGame(u32 kDown);
 	void playAgain();
 	void addPointsTo(int Player);
-	void setScreens(C3D_RenderTarget* top, C3D_RenderTarget* bot);
-
 	int playerScoresPoint();
+	void startTimer();
+
+public:
+	void chooseMode();
+	void userInput(C2D_SpriteSheet* spriteSheet);
+	void setScreens(C3D_RenderTarget* top, C3D_RenderTarget* bot);
+	int secondsToPlay();
 
 	Game(GameGraphics* gfx_);
 };

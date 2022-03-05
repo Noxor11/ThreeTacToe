@@ -3,19 +3,33 @@
 #include "textScene.h"
 #include "scene.h"
 
+#define BACKGROUND_AVAILABLE 1
+#define BACKGROUND_OCCUPIED	 2
+
+
 class GameGraphics {
 private:
 	Object* grid;
 	Object* gamePieces[4] = {};
 	Object* placedPieces[9] = {};
 	Object* arrow;
+	Object* bgAvailable;
+	Object* bgNotAvailable;
+	Object* bg;
+
+
+	C2D_ImageTint* red;
+
+	std::string* scoreP1Arr;
+	std::string* scoreP2Arr;
+
 
 
 	int gPiecesIndex;
 
 	int placedPiecesCnt;
 
-
+	
 
 	Object* pieceOnPlay;
 
@@ -33,8 +47,13 @@ public:
 	void drawPlacedPieces();
 	void drawArrow();
 	void drawGrid();
-	void drawMenu(float size);
+	void drawScore();
+	void drawMenu();
+	void drawTime(int seconds);
 	void selectMode(int mode);
+	void initScore();
+	void setScoreP1(int scoreP1);
+	void setScoreP2(int scoreP2);
 
 	void renderTopScreen();
 	void renderBotScreen();
@@ -44,7 +63,9 @@ public:
 	void moveCursorDown();
 	void moveCursorLeft();
 	void moveCursorRight();
+	void setPieceBackground(int background);
 
 
-	GameGraphics(Object* grid, Object* p1Piece, Object* p1SelectedPiece, Object* p2Piece, Object* p2SelectedPiece, Object* arrow);
+
+	GameGraphics(Object* grid, Object* p1Piece, Object* p1SelectedPiece, Object* p2Piece, Object* p2SelectedPiece, Object* arrow, Object* available, Object* not_available);
 };
