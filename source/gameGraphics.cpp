@@ -3,6 +3,11 @@
 #define LOCAL_GAME	1
 #define ONLINE_GAME 2
 
+static Object* sprites = new Object[MAX_SPRITES];
+
+
+
+
 
 float textSize = 1.5f;
 
@@ -104,6 +109,14 @@ void GameGraphics::placePiece() {
 	placedPieces[placedPiecesCnt] = tmp;
 	placedPiecesCnt++;
 
+	pieceOnPlay->setPos(WIDTH_CENTER, HEIGHT_CENTER);
+	
+	bg->setPos(WIDTH_CENTER - 0.5f, HEIGHT_CENTER-1);
+
+
+}
+
+void GameGraphics::changePieceOnPlay(){
 	if (gPiecesIndex == 0) {
 		gPiecesIndex = 2;
 	}
@@ -114,7 +127,7 @@ void GameGraphics::placePiece() {
 	pieceOnPlay->setPos(WIDTH_CENTER, HEIGHT_CENTER);
 	
 	bg->setPos(WIDTH_CENTER - 0.5f, HEIGHT_CENTER-1);
-	
+
 
 	pieceOnPlay = gamePieces[gPiecesIndex];
 }
@@ -169,11 +182,23 @@ void GameGraphics::setPieceBackground(int background){
 
 
 
-GameGraphics::GameGraphics(Object* _grid, Object* p1Piece, Object* p1SelectedPiece, Object* p2Piece, Object* p2SelectedPiece, Object* _arrow, C2D_Image available, C2D_Image not_available) {
-	gamePieces[0] = p1Piece;
-	gamePieces[1] = p1SelectedPiece;
-	gamePieces[2] = p2Piece;
-	gamePieces[3] = p2SelectedPiece;
+GameGraphics::GameGraphics() {
+	
+	// Load graphics
+	spriteSheet = C2D_SpriteSheetLoad("romfs:/gfx/sprites.t3x");
+	if (!spriteSheet) svcBreak(USERBREAK_PANIC);
+	
+	// Create Sprites from sprite sheet
+
+
+	
+
+
+	
+	gamePieces[0] = new Object(sprites, &spriteSheet, 1);
+	gamePieces[1] = new Object(sprites, &spriteSheet, 2);
+	gamePieces[2] = new Object(sprites, &spriteSheet, 3);
+	gamePieces[3] = new Object(sprites, &spriteSheet, 4);
 
 
 	scoreP1Arr = new std::string("0");
@@ -182,12 +207,18 @@ GameGraphics::GameGraphics(Object* _grid, Object* p1Piece, Object* p1SelectedPie
 	gPiecesIndex = 0;
 	placedPiecesCnt = 0;
 	pieceOnPlay = gamePieces[0];
-	grid = _grid;
-	arrow = _arrow;
-	bgAvailable = available;
-	bgNotAvailable = not_available;
+	grid = new Object(sprites, &spriteSheet, 0);
+
+	arrow = new Object(sprites, &spriteSheet, 6, -150, 0);
+	arrow->setPos(70, HEIGHT_CENTER - 15);
+
+	bgAvailable = (new Object(sprites, &spriteSheet, 7))->getImage();
+	bgNotAvailable = (new Object(sprites, &spriteSheet, 8))->getImage();
 	bg = new Object(bgAvailable);
 	bg->setPos(WIDTH_CENTER - 0.5f, HEIGHT_CENTER-1);
+
+
+
 
 
 }

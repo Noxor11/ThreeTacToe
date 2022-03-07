@@ -3,11 +3,14 @@
 #include <iostream>
 
 
-#define PLAYER1	1
-#define PLAYER2	2
+#define PLAYER1		1
+#define PLAYER2	   -1
+#define SAME_PIECE	3
 
 #define PLACED		1
 #define	NOT_PLACED	0
+
+
 
 
 
@@ -81,6 +84,8 @@ void Game::showScore() {
 void Game::resetMovingPiecePos() {
 	xTilesAway = 0;
 	yTilesAway = 0;
+	placingPosition = 4;
+
 
 }
 
@@ -101,18 +106,17 @@ bool Game::placePiece() {
 }
 
 void Game::nextTurn() {
-
-	timerIsSet = false;
 	resetMovingPiecePos();
+	gfx->changePieceOnPlay();
+	timerIsSet = false;
 
 	isPlayer1Turn = !(isPlayer1Turn);
-	placingPosition = 4;
 	playerHasNotChosen = 1;
 	turnsPlayed++;
 }
 
 int Game::isTie() {
-	if (turnsPlayed == 9)
+	if (placedPiecesCnt == 9)
 		return TIE;
 	
 
@@ -177,6 +181,7 @@ void Game::chooseMode() {
 
 		if(secondsToPlay() == 4){
 			timerIsSet = false;
+			nextTurn();
 			startTimer();
 
 		}
@@ -194,7 +199,7 @@ void Game::startLocalGame(u32 kDown) {
 	gfx->drawGrid();
 	drawPlacedPieces();
 
-	if (!playerScoresPoint() ) {
+	if (playerScoresPoint() == false && isTie() == false) {
 		drawPieceOnPlay();
 		playerMove(kDown);
 
@@ -265,41 +270,46 @@ void Game::nextRound() {
 	gfx->prepareNextRound();
 }
 
+/**
+ * @brief Check if a player has a three on line by adding the values in cell positions.
+ * 
+ * @return The player scoring. 1 if Player 1, -1 if Player 2, 0 if none.
+ */
 int Game::playerScoresPoint() {
 
 
 	//	Horizontal Check
-	if (placedPos[0] != 0 && placedPos[0] == placedPos[1] && placedPos[0] == placedPos[2])
+	if (std::abs(placedPos[0] + placedPos[1] + placedPos[2]) == SAME_PIECE)
 		return placedPos[0];
 	
-	if (placedPos[3] != 0 && placedPos[3] == placedPos[4] && placedPos[3] == placedPos[5])
+	if (std::abs(placedPos[3] + placedPos[4] + placedPos[5]) == SAME_PIECE)
 		return placedPos[3];
 
-	if (placedPos[6] != 0 && placedPos[6] == placedPos[7] && placedPos[6] == placedPos[8])
+	if (std::abs(placedPos[6] + placedPos[7] + placedPos[8]) == SAME_PIECE)
 		return placedPos[6];
 
 	//	Vertical Check
 	
-	if (placedPos[0] != 0 && placedPos[0] == placedPos[3] && placedPos[0] == placedPos[6])
+	if (std::abs(placedPos[0] + placedPos[3] + placedPos[6]) == SAME_PIECE)
 		return placedPos[0];
 
-	if (placedPos[1] != 0 && placedPos[1] == placedPos[4] && placedPos[1] == placedPos[7])
+	if (std::abs(placedPos[1] + placedPos[4] + placedPos[7]) == SAME_PIECE)
 		return placedPos[1];
 
-	if (placedPos[2] != 0 && placedPos[2] == placedPos[5] && placedPos[2] == placedPos[8])
+	if (std::abs(placedPos[2] + placedPos[5] + placedPos[8]) == SAME_PIECE)
 		return placedPos[2];
 
 	//	Diagonal Check
 
-	if (placedPos[0] != 0 && placedPos[0] == placedPos[4] && placedPos[0] == placedPos[8])
+	if (std::abs(placedPos[0] + placedPos[4] + placedPos[8]) == SAME_PIECE)
 		return placedPos[0];
 
-	if (placedPos[2] != 0 && placedPos[2] == placedPos[4] && placedPos[2] == placedPos[6])
+	if (std::abs(placedPos[2] + placedPos[4] + placedPos[6]) == SAME_PIECE)
 		return placedPos[2];
 
 
-	//	If no player has gotten three on line, return wether it's a draw or not 
-	return isTie();
+	
+	return 0;
 
 }
 
@@ -309,18 +319,19 @@ int Game::playerScoresPoint() {
 
 
 
-void Game::userInput(C2D_SpriteSheet* spriteSheet){
+void Game::userInput(){
 	// Respond to user input
 	hidScanInput();
 
 	kDown = hidKeysDown();
 	if (kDown & KEY_START) {
+		
 		textScene::exitTextScene();
 		cfguExit();
 
 
 		// De-init libs and sprites
-		gameScene::stopScene(spriteSheet);
+		gameScene::stopScene(&gfx->spriteSheet);
 		exit(0);	// break in order to return to hbmenu
 	}
 
@@ -358,6 +369,15 @@ void Game::initScore(){
 	gfx->initScore();
 	scoreP1 = 0;
 	scoreP2 = 0;
+}
+
+void Game::deInit(){
+	// Deinitialize the scene
+	textScene::exitTextScene();
+	cfguExit();
+	
+	// De-init libs and sprites
+	gameScene::stopScene(&gfx->spriteSheet);
 }
 
 

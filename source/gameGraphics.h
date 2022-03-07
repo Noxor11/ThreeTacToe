@@ -9,6 +9,7 @@
 
 class GameGraphics {
 private:
+
 	Object* grid;
 	Object* gamePieces[4] = {};
 	Object* placedPieces[9] = {};
@@ -41,6 +42,7 @@ private:
 
 
 public:
+	C2D_SpriteSheet spriteSheet;
 	void setScreens(C3D_RenderTarget* tScreen, C3D_RenderTarget* botScreen);
 	void prepareNextRound();
 	void drawPieceOnPlay();
@@ -58,6 +60,7 @@ public:
 	void renderTopScreen();
 	void renderBotScreen();
 	void placePiece();
+	void changePieceOnPlay();
 
 	void moveCursorUp();
 	void moveCursorDown();
@@ -67,5 +70,5 @@ public:
 
 
 
-	GameGraphics(Object* grid, Object* p1Piece, Object* p1SelectedPiece, Object* p2Piece, Object* p2SelectedPiece, Object* arrow, C2D_Image available, C2D_Image not_available);
+	GameGraphics();
 };

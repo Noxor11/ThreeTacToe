@@ -16,8 +16,6 @@
 #define SCREEN_WIDTH  400
 #define SCREEN_HEIGHT 240
 
-static C2D_SpriteSheet spriteSheet;
-static Object* sprites = new Object[MAX_SPRITES];
 
 
 
@@ -32,40 +30,12 @@ int main(int argc, char* argv[]) {
 	gameScene::initScene();
 	textScene::initTextScene();
 	
-	
-
 	// Create screens
 	C3D_RenderTarget* top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
 	C3D_RenderTarget* bot = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
 
-
-	// Load graphics
-	spriteSheet = C2D_SpriteSheetLoad("romfs:/gfx/sprites.t3x");
-	if (!spriteSheet) svcBreak(USERBREAK_PANIC);
-
-
-
-
-	// Create Sprites from sprite sheet
-	Object* grid		= new Object(sprites, &spriteSheet, 0);
-	Object* x			= new Object(sprites, &spriteSheet, 1);
-	Object* xRed		= new Object(sprites, &spriteSheet, 2);
-	Object* o			= new Object(sprites, &spriteSheet, 3);
-	Object* oBlue		= new Object(sprites, &spriteSheet, 4);
-	Object* messageBox	= new Object(sprites, &spriteSheet, 5);
-
 	
-
-	Object* arrow		= new Object(sprites, &spriteSheet, 6, -150, 0);
-	arrow->setPos(70, HEIGHT_CENTER - 15);
-
-	Object* available	= new Object(sprites, &spriteSheet, 7);
-	Object* n_available	= new Object(sprites, &spriteSheet, 8);
-
-	C2D_Image av = available->getImage();
-	C2D_Image n_av = n_available->getImage();
-	
-	GameGraphics* gfx = new GameGraphics(grid, x, xRed, o, oBlue, arrow, av, n_av);
+	GameGraphics* gfx = new GameGraphics();
 
 	
 
@@ -82,7 +52,7 @@ int main(int argc, char* argv[]) {
 
 		
 
-		gm.userInput(&spriteSheet);
+		gm.userInput();
 		gm.chooseMode();
 
 		C3D_FrameEnd(0);
@@ -91,13 +61,11 @@ int main(int argc, char* argv[]) {
 		
 	}
 
-	// Deinitialize the scene
-	textScene::exitTextScene();
-	cfguExit();
+	
 
+	gm.deInit();
+	
 
-	// De-init libs and sprites
-	gameScene::stopScene(&spriteSheet);
 
 	return 0;
 }

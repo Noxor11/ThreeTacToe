@@ -76,9 +76,10 @@ class Game {
 
 public:
 	void chooseMode();
-	void userInput(C2D_SpriteSheet* spriteSheet);
+	void userInput();
 	void setScreens(C3D_RenderTarget* top, C3D_RenderTarget* bot);
 	int secondsToPlay();
+	void deInit();
 
 	Game(GameGraphics* gfx_);
 };
