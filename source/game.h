@@ -25,7 +25,6 @@ class Game {
 
 	int placedPiecesCnt;
 	int placingPosition;
-	int turnsPlayed;
 	int gameMode = UNSET;
 	bool isPlayer1Turn;
 	bool isPlayer1First;

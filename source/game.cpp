@@ -112,7 +112,6 @@ void Game::nextTurn() {
 
 	isPlayer1Turn = !(isPlayer1Turn);
 	playerHasNotChosen = 1;
-	turnsPlayed++;
 }
 
 int Game::isTie() {
@@ -191,6 +190,16 @@ void Game::chooseMode() {
 		startLocalGame(kDown);
 
 	}
+	else if (gameMode == ONLINE_GAME) {
+		showScore();
+		
+		if(!timerIsSet){
+			startTimer();
+		}
+
+		gfx->renderTopScreen();
+
+	}
 
 }
 
@@ -205,6 +214,9 @@ void Game::startLocalGame(u32 kDown) {
 
 	}
 	else {
+		
+		timerIsSet = false;
+
 		if (isTie()) {
 			printf("\x1b[12;7HLa vieja won!");
 		}
@@ -262,7 +274,6 @@ void Game::nextRound() {
 	isPlayer1First = !(isPlayer1First);
 	isPlayer1Turn = isPlayer1First;
 	placedPiecesCnt = 0;
-	turnsPlayed = 0;
 	playerHasNotChosen = 1;
 	placingPosition = 4;
 
@@ -387,7 +398,6 @@ Game::Game(GameGraphics* gfx_) {
 	
 	initScore();
 	playerHasNotChosen = 1;
-	turnsPlayed = 0;
 	isPlayer1First = 1;
 	isPlayer1Turn = 1;
 	placedPiecesCnt = 0;
