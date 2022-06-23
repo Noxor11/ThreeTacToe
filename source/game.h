@@ -7,9 +7,15 @@
 
 
 #define COUNTDOWN	100
+
 #define UNSET		-1
+
 #define LOCAL_GAME	1
 #define ONLINE_GAME 2
+
+#define CLASSIC_MODE	1
+#define RUSH_MODE		2
+
 #define TIE			3
 
 
@@ -25,7 +31,10 @@ class Game {
 
 	int placedPiecesCnt;
 	int placingPosition;
+	
+	int gameModeOnlineLocal = UNSET;
 	int gameMode = UNSET;
+
 	bool isPlayer1Turn;
 	bool isPlayer1First;
 
@@ -45,7 +54,8 @@ class Game {
 	
 	bool timerIsSet = false;
 
-
+	touchPosition touch;
+	touchPosition formerTouch;
 	u32 kDown;
 
 	int isTie();
@@ -64,7 +74,9 @@ class Game {
 	void moveCursorDown();
 	void moveCursorLeft();
 	void moveCursorRight();
+	void moverCursorToPlace(int index);
 	void checkForMovement();
+	int  getTouchPlacingPosition();
 	void initScore();
 	void playerMove(u32 kDown);
 	void startLocalGame(u32 kDown);

@@ -13,7 +13,7 @@
 #include "textScene.h"
 
 #define MAX_SPRITES   768
-#define SCREEN_WIDTH  400
+#define SCREEN_WIDTH  320
 #define SCREEN_HEIGHT 240
 
 

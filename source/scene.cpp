@@ -30,12 +30,12 @@ namespace gameScene{
 	}
 
 
-	void renderScene(C3D_RenderTarget* scene) {
+	void renderScene(C3D_RenderTarget* screen) {
 
 
 		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-		C2D_TargetClear(scene, C2D_Color32(0x68, 0xB0, 0xD8, 0xFF));
-		C2D_SceneBegin(scene);
+		C2D_TargetClear(screen, C2D_Color32(0x68, 0xB0, 0xD8, 0xFF));
+		C2D_SceneBegin(screen);
 	}
 
 	void draw(Object* object) {
@@ -44,13 +44,6 @@ namespace gameScene{
 	}
 
 
-	void drawPieceTop(Object* object) {
-		
-	}
 
-
-	void drawPieceBottom(Object* object) {
-
-	}
 }
 

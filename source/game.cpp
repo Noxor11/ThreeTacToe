@@ -36,24 +36,47 @@ bool Game::isPlaceFree() {
 }
 
 void Game::checkForMovement(){
-	if (kDown & KEY_UP && yTilesAway < 1) 
-		moveCursorUp();
 
-	if (kDown & KEY_DOWN && yTilesAway > -1)
-		moveCursorDown();
+	if(gameMode == CLASSIC_MODE){
 
-	if (kDown & KEY_RIGHT && xTilesAway < 1) 
-		moveCursorRight();
+		if (kDown & KEY_UP && yTilesAway < 1) 
+			moveCursorUp();
 
-	if (kDown & KEY_LEFT && xTilesAway > -1) 
-		moveCursorLeft();		
+		if (kDown & KEY_DOWN && yTilesAway > -1)
+			moveCursorDown();
 
-	if(isPlaceFree())
-		gfx->setPieceBackground(BACKGROUND_AVAILABLE);
-	else
-		gfx->setPieceBackground(BACKGROUND_OCCUPIED);
-	
-	if (kDown & KEY_A) {	//	Place if there's not another piece below
+		if (kDown & KEY_RIGHT && xTilesAway < 1) 
+			moveCursorRight();
+
+		if (kDown & KEY_LEFT && xTilesAway > -1) 
+			moveCursorLeft();	
+
+		else if (kDown & KEY_A) {	//	Place if there's not another piece below
+			if (placePiece()) {
+
+				//	Piece to place belongs to...
+				if (isPlayer1Turn)
+					placedPos[placingPosition] = PLAYER1;
+				else
+					placedPos[placingPosition] = PLAYER2;
+					
+				playerHasNotChosen = 0;
+			}
+
+		}	
+			
+		if(isPlaceFree())
+			gfx->setPieceBackground(placingPosition, BACKGROUND_AVAILABLE);
+		else
+			gfx->setPieceBackground(placingPosition, BACKGROUND_OCCUPIED);
+		
+	} else{
+
+		int touchi = getTouchPlacingPosition();
+		if(touchi != UNSET){
+
+			moverCursorToPlace(touchi);
+
 			if (placePiece()) {
 
 				//	Piece to place belongs to...
@@ -65,7 +88,67 @@ void Game::checkForMovement(){
 				playerHasNotChosen = 0;
 			}
 		}
+
+	}
+
+
+
+	
 }
+
+int Game::getTouchPlacingPosition(){
+	formerTouch = touch;
+	hidTouchRead(&touch);
+
+	int beginX = (gfx->getGrid()->px() - gfx->getGrid()->getSprite()->params.pos.w / 2) + 5;
+	int endX   = (gfx->getGrid()->px() + gfx->getGrid()->getSprite()->params.pos.w / 2) + 5;
+
+	int beginY = (gfx->getGrid()->py() - gfx->getGrid()->getSprite()->params.pos.h / 2) + 5;
+	int endY   = (gfx->getGrid()->py() + gfx->getGrid()->getSprite()->params.pos.h / 2) + 8;
+	
+	if(formerTouch.px == 0 && formerTouch.py == 0){
+
+		//	If within range of grid...
+		if(touch.px > beginX  && touch.px < endX && touch.py > beginY  && touch.py < endY){
+
+			//	Get position from x and y coords
+			int x_index = (touch.px / ((endX - beginX - 8) / 3)) - 1;
+			if(x_index > 2)
+				x_index = 2;
+			if(x_index < 0)
+				x_index = 0;
+
+			int y_index = (touch.py / ((endY - beginY ) / 2.7));
+			if(y_index > 2)
+				y_index = 2;
+			if(y_index < 0){
+				y_index = 0;
+			}
+
+			xTilesAway = x_index - 1;
+			yTilesAway = -(y_index - 1);
+
+			int index = x_index + (y_index * 3);
+			return index;
+		}
+	}
+
+	return UNSET;
+
+
+}
+
+void Game::moverCursorToPlace(int index){
+	gfx->moveCursorToPlace(index);
+
+	placingPosition = index;
+	
+	
+
+}
+
+
+
 
 
 void Game::drawPlacedPieces() {
@@ -94,7 +177,7 @@ bool Game::placePiece() {
 
 	if (isPlaceFree()) {		
 		placedPiecesCnt++;
-		gfx->placePiece();
+		gfx->placePiece(placingPosition);
 				
 		return 1;
 	}
@@ -112,6 +195,8 @@ void Game::nextTurn() {
 
 	isPlayer1Turn = !(isPlayer1Turn);
 	playerHasNotChosen = 1;
+	if(gameMode == CLASSIC_MODE)
+		gfx->setPieceBackground(placingPosition, BACKGROUND_AVAILABLE);
 }
 
 int Game::isTie() {
@@ -145,14 +230,14 @@ void Game::moveCursorLeft() {
 
 
 void Game::drawGameMenu() {
-	gfx->drawMenu();
+	gfx->drawOnlineLocalMenu();
 }
 
 void Game::chooseMode() {
-	gfx->renderBotScreen();
+	gfx->renderTopScreen();
 	
 	
-	if (gameMode < 1) {
+	if (gameModeOnlineLocal < 1) {
 		if (kDown & KEY_UP) {
 			selectMode(LOCAL_GAME);
 		}
@@ -166,42 +251,76 @@ void Game::chooseMode() {
 		}
 
 		gfx->drawArrow();
-		gfx->drawMenu();
+		gfx->drawOnlineLocalMenu();
 
 		
 
 	}
-	else if (gameMode == LOCAL_GAME) {
+	else if (gameModeOnlineLocal == LOCAL_GAME) {
+
+		if(gameMode < 0){
+
+			if (kDown & KEY_UP) {
+				gfx->selectMode(CLASSIC_MODE);
+				gameMode = -CLASSIC_MODE;
+			}
+
+			if (kDown & KEY_DOWN) {
+				gfx->selectMode(RUSH_MODE);
+				gameMode = -RUSH_MODE;
+			}
+
+			if (kDown & KEY_A) {
+				gameMode = -gameMode;
+			}
+
+			gfx->drawArrow();
+			gfx->drawClassicRushMenu();
+
+		} else if(gameMode == RUSH_MODE){
+
+			gfx->setGameMode(RUSH_MODE);
+			showScore();
+			gfx->showPieceOnPlayTopScreen();
+			
+			if(!timerIsSet){
+				startTimer();
+			}
+
+			if(secondsToPlay() == 4){
+				timerIsSet = false;
+				nextTurn();
+				startTimer();
+
+			}
+			gfx->drawTime(secondsToPlay());
+
+			gfx->renderBotScreen();
+			startLocalGame(kDown);
+		} else{
+
+			gfx->setGameMode(CLASSIC_MODE);
+			showScore();
+
+			gfx->renderBotScreen();
+			startLocalGame(kDown);
+		}
+
+	}
+	else if (gameModeOnlineLocal == ONLINE_GAME) {
 		showScore();
 		
 		if(!timerIsSet){
 			startTimer();
 		}
 
-		if(secondsToPlay() == 4){
-			timerIsSet = false;
-			nextTurn();
-			startTimer();
-
-		}
-		gfx->drawTime(secondsToPlay());
-
-		gfx->renderTopScreen();
-		startLocalGame(kDown);
-
-	}
-	else if (gameMode == ONLINE_GAME) {
-		showScore();
-		
-		if(!timerIsSet){
-			startTimer();
-		}
-
-		gfx->renderTopScreen();
+		gfx->renderBotScreen();
 
 	}
 
 }
+
+
 
 void Game::startLocalGame(u32 kDown) {
 
@@ -209,7 +328,8 @@ void Game::startLocalGame(u32 kDown) {
 	drawPlacedPieces();
 
 	if (playerScoresPoint() == false && isTie() == false) {
-		drawPieceOnPlay();
+		if(gameMode == CLASSIC_MODE)
+			drawPieceOnPlay();
 		playerMove(kDown);
 
 	}
@@ -242,12 +362,12 @@ void Game::startLocalGame(u32 kDown) {
 
 void Game::selectMode(int mode) {
 	gfx->selectMode(mode);
-	gameMode = -mode;
+	gameModeOnlineLocal = -mode;
 
 }
 
 void Game::confirmSelect() {
-	gameMode *= -1;	//	select game by making it positive
+	gameModeOnlineLocal *= -1;	//	select game by making it positive
 }
 
 
@@ -362,9 +482,9 @@ void Game::addPointsTo(int Player){
 
 int Game::secondsToPlay(){
 	return  	(svcGetSystemTick() / SYSCLOCK_ARM11) - difference;
-
-
 }
+
+
 
 void Game::setScreens(C3D_RenderTarget* top, C3D_RenderTarget* bot) {
 	gfx->setScreens(top, bot);
@@ -404,6 +524,9 @@ Game::Game(GameGraphics* gfx_) {
 	placingPosition = 4;
 
 	resetMovingPiecePos();
+
+	formerTouch.px = 0;
+	formerTouch.py = 0;
 
 }
 

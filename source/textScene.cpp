@@ -1,7 +1,7 @@
 #include "textScene.h"
 
 C2D_TextBuf g_staticBuf;
-std::array<C2D_Text, 6> g_staticText;
+std::array<C2D_Text, 8> g_staticText;
 std::array<C2D_Text, 10> scoreNumberText;
 C2D_Font font;
 
@@ -26,6 +26,10 @@ namespace textScene{
 
 		C2D_TextFontParse(&g_staticText[5], font, g_staticBuf, "Player 2 Score:");
 
+		C2D_TextFontParse(&g_staticText[6], font, g_staticBuf, "Classic Mode");
+		C2D_TextFontParse(&g_staticText[7], font, g_staticBuf, "Rush    Mode");
+
+
 
 
 		//	Numbers for score display
@@ -48,11 +52,19 @@ namespace textScene{
 	}
 
 
-	void drawMenu(float size)
+	void drawOnlineLocalMenu(float size)
 	{
 		// Draw static text strings
 		C2D_DrawText(&g_staticText[0], 0, 100, HEIGHT_CENTER - 30, 0.5f, size, size);
 		C2D_DrawText(&g_staticText[1], 0, 100, HEIGHT_CENTER, 0.5f, size, size);
+
+	}
+
+	void drawClassicRushMenu(float size){
+		
+		// Draw static text strings
+		C2D_DrawText(&g_staticText[6], 0, 100, HEIGHT_CENTER - 30, 0.5f, size, size);
+		C2D_DrawText(&g_staticText[7], 0, 100, HEIGHT_CENTER, 0.5f, size, size);
 
 	}
 

@@ -1,12 +1,23 @@
 #include "gameGraphics.h"
+#include "game.h"
 
-#define LOCAL_GAME	1
-#define ONLINE_GAME 2
+
+
+
+#define CELL_SPACE_DIFFERENCE 	66
+#define BG_SPACE_DIFFERENCE		64
+
+#define X_PIECE_RED 	0
+#define X_PIECE_BLACK	1
+
+#define O_PIECE_BLUE 	2
+#define O_PIECE_BLACK	3
+
 
 static Object* sprites = new Object[MAX_SPRITES];
 
 
-
+ 
 
 
 float textSize = 1.5f;
@@ -22,17 +33,15 @@ void GameGraphics::setScreens(C3D_RenderTarget* tScreen, C3D_RenderTarget* botSc
 
 void GameGraphics::prepareNextRound() {
 	for (int i = 0; i < placedPiecesCnt; i++)
-		placedPieces[i] = nullptr;
+		placedPieces[i] = {};
 
 	placedPiecesCnt = 0;
 	changeFirstPiece();
-	gPiecesIndex = 0;
-	pieceOnPlay = gamePieces[0];
+	pieceOnPlay = gamePieces[gPiecesIndex];
 }
 
 
 void GameGraphics::drawPieceOnPlay() {
-
 	gameScene::draw(bg);
 	gameScene::draw(pieceOnPlay);
 }
@@ -51,8 +60,12 @@ void GameGraphics::drawArrow() {
 	gameScene::draw(arrow);
 }
 
-void GameGraphics::drawMenu(){
-	textScene::drawMenu(textSize);
+void GameGraphics::drawOnlineLocalMenu(){
+	textScene::drawOnlineLocalMenu(textSize);
+}
+
+void GameGraphics::drawClassicRushMenu(){
+	textScene::drawClassicRushMenu(textSize);
 }
 
 void GameGraphics::drawScore(){
@@ -60,6 +73,9 @@ void GameGraphics::drawScore(){
 
 }
 
+void GameGraphics::showPieceOnPlayTopScreen(){
+	gameScene::draw(pieceOnPlay);
+}
 
 void GameGraphics::renderTopScreen() {
 	gameScene::renderScene(topScreen);
@@ -69,12 +85,18 @@ void GameGraphics::renderBotScreen() {
 	gameScene::renderScene(bottomScreen);
 }
 
+/**
+ * @brief Selects mode not only for online / local game,
+ * but also for classic / rush mode
+ * 
+ * @param mode 
+ */
 void GameGraphics::selectMode(int mode) {
 	switch (mode) {
-	case LOCAL_GAME:
+	case 1:
 		arrow->setPos(70, HEIGHT_CENTER - 15);
 		break;
-	case ONLINE_GAME:
+	case 2:
 		arrow->setPos(70, HEIGHT_CENTER + 15);
 		break;
 	}
@@ -84,29 +106,112 @@ void GameGraphics::selectMode(int mode) {
 void GameGraphics::moveCursorUp() {
 	pieceOnPlay->moveYBy(66);
 	bg->moveYBy(64);
+	printf("Position X: %f Y: %f\n", pieceOnPlay->px(), pieceOnPlay->py());
+
 }
 void GameGraphics::moveCursorDown() {
 	pieceOnPlay->moveYBy(-66);
 	bg->moveYBy(-64);
 
+
 }
 void GameGraphics::moveCursorLeft() {
 	pieceOnPlay->moveXBy(-66);
 	bg->moveXBy(-64);
+	printf("Position X: %f Y: %f\n", pieceOnPlay->px(), pieceOnPlay->py());
+
 }
 void GameGraphics::moveCursorRight() {
 	pieceOnPlay->moveXBy(66);
 	bg->moveXBy(64);
+	printf("Position X: %f Y: %f\n", pieceOnPlay->px(), pieceOnPlay->py());
+
+}
+
+void GameGraphics::moveCursorToPlace(int index){
+	int piece_X = SCREEN_WIDTH / 2;
+	int Piece_Y = SCREEN_HEIGHT / 2;
+
+	int bg_X = WIDTH_CENTER - 0.5f;
+	int bg_Y = HEIGHT_CENTER-1;
+
+	switch (index){
+	case 0:
+		piece_X -= 66;
+		Piece_Y -= 66;
+
+		bg_X -= BG_SPACE_DIFFERENCE;
+		bg_Y -= BG_SPACE_DIFFERENCE;
+		break;
+	
+	case 1:
+		Piece_Y -= 66;
+		bg_Y -= BG_SPACE_DIFFERENCE;
+		break;
+
+	case 2:
+		piece_X += 66;
+		Piece_Y -= 66;
+
+		bg_X += BG_SPACE_DIFFERENCE;
+		bg_Y -= BG_SPACE_DIFFERENCE;
+		break;
+
+	case 3:
+		piece_X -= 66;
+		bg_X -= BG_SPACE_DIFFERENCE;
+		break;
+
+	//	It's already in the middle
+	// case 4:
+	// 	break;
+
+	case 5:
+		piece_X += 66;
+		bg_X += BG_SPACE_DIFFERENCE;
+		break;
+
+	case 6:
+		piece_X -= 66;
+		Piece_Y += 66;
+
+		bg_X -= BG_SPACE_DIFFERENCE;
+		bg_Y += BG_SPACE_DIFFERENCE;
+		break;
+
+	case 7:
+		Piece_Y += 66;
+		bg_Y += BG_SPACE_DIFFERENCE;
+		break;
+
+	case 8:
+		piece_X += 66;
+		Piece_Y += 66;
+
+		bg_X += BG_SPACE_DIFFERENCE;
+		bg_Y += BG_SPACE_DIFFERENCE;
+		break;
+
+
+	}
+
+	pieceOnPlay->setX(piece_X);
+	pieceOnPlay->setY(Piece_Y);
+
+	bg->setX(bg_X);
+	bg->setY(bg_Y);
+
 }
 
 
-void GameGraphics::placePiece() {
+void GameGraphics::placePiece(int placing_position) {
 	gamePieces[gPiecesIndex + 1]->setPos(WIDTH_CENTER, HEIGHT_CENTER);
 
 	Object* tmp = new Object(*gamePieces[gPiecesIndex + 1]);
 	tmp->setPos(pieceOnPlay);
 
 	placedPieces[placedPiecesCnt] = tmp;
+
 	placedPiecesCnt++;
 
 	pieceOnPlay->setPos(WIDTH_CENTER, HEIGHT_CENTER);
@@ -116,37 +221,34 @@ void GameGraphics::placePiece() {
 
 }
 
+
+
 void GameGraphics::changePieceOnPlay(){
-	if (gPiecesIndex == 0) {
-		gPiecesIndex = 2;
+	if (gPiecesIndex == X_PIECE_RED) {
+		gPiecesIndex = O_PIECE_BLUE;
 	}
 	else {
-		gPiecesIndex = 0;
+		gPiecesIndex = X_PIECE_RED;
 	}
 
 	pieceOnPlay->setPos(WIDTH_CENTER, HEIGHT_CENTER);
 	
 	bg->setPos(WIDTH_CENTER - 0.5f, HEIGHT_CENTER-1);
 
-
+	currentPieceImage = gamePieces[gPiecesIndex]->getImage();
 	pieceOnPlay = gamePieces[gPiecesIndex];
 }
 
 void GameGraphics::changeFirstPiece() {
-	Object* tmp = gamePieces[0];
+	if(wasXFirst){
+		gPiecesIndex = O_PIECE_BLUE;
+	} else{
+		gPiecesIndex = X_PIECE_RED;
+	}
 
+	wasXFirst = !wasXFirst;
 
-	//	Exchange moving Pieces
-	gamePieces[0] = gamePieces[2];
-	gamePieces[2] = tmp;
-
-	//	Exchange static Pieces
-	tmp = gamePieces[1];
-
-	gamePieces[1] = gamePieces[3];
-	gamePieces[3] = tmp;
-
-
+	currentPieceImage = gamePieces[gPiecesIndex]->getImage();
 }
 
 void GameGraphics::setScoreP1(int scoreP1){
@@ -172,13 +274,31 @@ void GameGraphics::drawTime(int seconds){
 }
 
 
-void GameGraphics::setPieceBackground(int background){
-	if(background == BACKGROUND_AVAILABLE)
+void GameGraphics::setPieceBackground(int index, int background){
+	if(background == BACKGROUND_AVAILABLE){
 		bg->setImage(bgAvailable);
-	else
+		pieceOnPlay->setImage(currentPieceImage);
+	}
+	else{	
 		bg->setImage(bgNotAvailable);
+	}
 }
 
+
+
+Object* GameGraphics::getGrid(){
+	return grid;
+}
+
+
+void GameGraphics::setGameMode(int gameMode){
+	this->gameMode = gameMode;
+
+	if(gameMode == RUSH_MODE){
+		pieceOnPlay->setImage(gamePieces[gPiecesIndex + 1]->getImage());
+		pieceOnPlay->setPos( (SCREEN_WIDTH + 80) / 2, (SCREEN_HEIGHT / 2) + 20);
+	}
+}
 
 
 
@@ -191,6 +311,9 @@ GameGraphics::GameGraphics() {
 	// Create Sprites from sprite sheet
 
 
+
+
+
 	
 
 
@@ -199,6 +322,7 @@ GameGraphics::GameGraphics() {
 	gamePieces[1] = new Object(sprites, &spriteSheet, 2);
 	gamePieces[2] = new Object(sprites, &spriteSheet, 3);
 	gamePieces[3] = new Object(sprites, &spriteSheet, 4);
+
 
 
 	scoreP1Arr = new std::string("0");
@@ -218,6 +342,7 @@ GameGraphics::GameGraphics() {
 	bg->setPos(WIDTH_CENTER - 0.5f, HEIGHT_CENTER-1);
 
 
+	currentPieceImage = pieceOnPlay->getImage();
 
 
 

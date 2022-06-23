@@ -10,7 +10,9 @@ namespace textScene{
     
     
     void initTextScene(void);
-    void drawMenu(float size);
+    void drawOnlineLocalMenu(float size);
+    void drawClassicRushMenu(float size);
+
     void drawTime(int seconds, float size);
 
     void drawScore(float size, std::string score1Arr, std::string score2Arr);

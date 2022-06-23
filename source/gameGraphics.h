@@ -12,11 +12,17 @@ private:
 
 	Object* grid;
 	Object* gamePieces[4] = {};
+
+
+
 	Object* placedPieces[9] = {};
+
 	Object* arrow;
 	C2D_Image bgAvailable;
 	C2D_Image bgNotAvailable;
 	Object* bg;
+
+	C2D_Image currentPieceImage;
 
 
 	C2D_ImageTint* red;
@@ -30,6 +36,8 @@ private:
 
 	int placedPiecesCnt;
 
+	bool wasXFirst = true;
+	int gameMode;
 	
 
 	Object* pieceOnPlay;
@@ -42,6 +50,7 @@ private:
 
 
 public:
+
 	C2D_SpriteSheet spriteSheet;
 	void setScreens(C3D_RenderTarget* tScreen, C3D_RenderTarget* botScreen);
 	void prepareNextRound();
@@ -50,7 +59,8 @@ public:
 	void drawArrow();
 	void drawGrid();
 	void drawScore();
-	void drawMenu();
+	void drawOnlineLocalMenu();
+	void drawClassicRushMenu();
 	void drawTime(int seconds);
 	void selectMode(int mode);
 	void initScore();
@@ -59,15 +69,22 @@ public:
 
 	void renderTopScreen();
 	void renderBotScreen();
-	void placePiece();
+	void placePiece(int placing_position);
 	void changePieceOnPlay();
 
 	void moveCursorUp();
 	void moveCursorDown();
 	void moveCursorLeft();
 	void moveCursorRight();
-	void setPieceBackground(int background);
+	void moveCursorToPlace(int index);
+	void setPieceBackground(int index, int background);
 
+	void setGameMode(int gameMode);
+	void showPieceOnPlayTopScreen();
+
+
+
+	Object* getGrid();
 
 
 	GameGraphics();

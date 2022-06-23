@@ -7,11 +7,8 @@ namespace gameScene{
 
     void stopScene(C2D_SpriteSheet* spriteSheet);
 
-    void renderScene(C3D_RenderTarget* scene);
-
+    void renderScene(C3D_RenderTarget* screen);
 
     void draw(Object* object);
-    void drawPieceTop(Object* object);
-    void drawPieceBottom(Object* object);
 
 }

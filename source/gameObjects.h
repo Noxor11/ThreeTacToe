@@ -14,7 +14,7 @@
 
 
 #define MAX_SPRITES			768
-#define SCREEN_WIDTH		400
+#define SCREEN_WIDTH		320
 #define SCREEN_HEIGHT		240
 #define FLOOR				224
 #define BACKGROUND_SIZE		512
