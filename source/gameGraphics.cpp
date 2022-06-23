@@ -7,11 +7,11 @@
 #define CELL_SPACE_DIFFERENCE 	66
 #define BG_SPACE_DIFFERENCE		64
 
-#define X_PIECE_RED 	0
-#define X_PIECE_BLACK	1
+#define X_PIECE_BLACK 	0
+#define X_PIECE_RED		1
 
-#define O_PIECE_BLUE 	2
-#define O_PIECE_BLACK	3
+#define O_PIECE_BLACK 	2
+#define O_PIECE_BLUE	3
 
 
 static Object* sprites = new Object[MAX_SPRITES];
@@ -38,6 +38,7 @@ void GameGraphics::prepareNextRound() {
 	placedPiecesCnt = 0;
 	changeFirstPiece();
 	pieceOnPlay = gamePieces[gPiecesIndex];
+	
 }
 
 
@@ -74,7 +75,7 @@ void GameGraphics::drawScore(){
 }
 
 void GameGraphics::showPieceOnPlayTopScreen(){
-	gameScene::draw(pieceOnPlay);
+	gameScene::draw(&staticPieceOnPlay);
 }
 
 void GameGraphics::renderTopScreen() {
@@ -224,11 +225,11 @@ void GameGraphics::placePiece(int placing_position) {
 
 
 void GameGraphics::changePieceOnPlay(){
-	if (gPiecesIndex == X_PIECE_RED) {
-		gPiecesIndex = O_PIECE_BLUE;
+	if (gPiecesIndex == X_PIECE_BLACK) {
+		gPiecesIndex = O_PIECE_BLACK;
 	}
 	else {
-		gPiecesIndex = X_PIECE_RED;
+		gPiecesIndex = X_PIECE_BLACK;
 	}
 
 	pieceOnPlay->setPos(WIDTH_CENTER, HEIGHT_CENTER);
@@ -237,18 +238,23 @@ void GameGraphics::changePieceOnPlay(){
 
 	currentPieceImage = gamePieces[gPiecesIndex]->getImage();
 	pieceOnPlay = gamePieces[gPiecesIndex];
+
+	staticPieceOnPlay.setImage(gamePieces[gPiecesIndex + 1]->getImage());
+
 }
 
 void GameGraphics::changeFirstPiece() {
 	if(wasXFirst){
-		gPiecesIndex = O_PIECE_BLUE;
+		gPiecesIndex = O_PIECE_BLACK;
 	} else{
-		gPiecesIndex = X_PIECE_RED;
+		gPiecesIndex = X_PIECE_BLACK;
 	}
 
 	wasXFirst = !wasXFirst;
 
 	currentPieceImage = gamePieces[gPiecesIndex]->getImage();
+	staticPieceOnPlay.setImage(gamePieces[gPiecesIndex + 1]->getImage());
+
 }
 
 void GameGraphics::setScoreP1(int scoreP1){
@@ -291,14 +297,6 @@ Object* GameGraphics::getGrid(){
 }
 
 
-void GameGraphics::setGameMode(int gameMode){
-	this->gameMode = gameMode;
-
-	if(gameMode == RUSH_MODE){
-		pieceOnPlay->setImage(gamePieces[gPiecesIndex + 1]->getImage());
-		pieceOnPlay->setPos( (SCREEN_WIDTH + 80) / 2, (SCREEN_HEIGHT / 2) + 20);
-	}
-}
 
 
 
@@ -318,10 +316,10 @@ GameGraphics::GameGraphics() {
 
 
 	
-	gamePieces[0] = new Object(sprites, &spriteSheet, 1);
-	gamePieces[1] = new Object(sprites, &spriteSheet, 2);
-	gamePieces[2] = new Object(sprites, &spriteSheet, 3);
-	gamePieces[3] = new Object(sprites, &spriteSheet, 4);
+	gamePieces[X_PIECE_BLACK] 	= new Object(sprites, &spriteSheet, 1);
+	gamePieces[X_PIECE_RED] 	= new Object(sprites, &spriteSheet, 2);
+	gamePieces[O_PIECE_BLACK] 	= new Object(sprites, &spriteSheet, 3);
+	gamePieces[O_PIECE_BLUE] 	= new Object(sprites, &spriteSheet, 4);
 
 
 
@@ -331,6 +329,11 @@ GameGraphics::GameGraphics() {
 	gPiecesIndex = 0;
 	placedPiecesCnt = 0;
 	pieceOnPlay = gamePieces[0];
+
+	staticPieceOnPlay = Object(sprites, &spriteSheet, 2);
+	staticPieceOnPlay.setPos( (SCREEN_WIDTH + 80) / 2, (SCREEN_HEIGHT / 2) + 20);
+
+
 	grid = new Object(sprites, &spriteSheet, 0);
 
 	arrow = new Object(sprites, &spriteSheet, 6, -150, 0);

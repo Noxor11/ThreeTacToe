@@ -274,12 +274,16 @@ void Game::chooseMode() {
 				gameMode = -gameMode;
 			}
 
+			//	Go back
+			if (kDown & KEY_B) {
+				gameModeOnlineLocal = UNSET;
+			}
+
 			gfx->drawArrow();
 			gfx->drawClassicRushMenu();
 
 		} else if(gameMode == RUSH_MODE){
 
-			gfx->setGameMode(RUSH_MODE);
 			showScore();
 			gfx->showPieceOnPlayTopScreen();
 			
@@ -299,7 +303,7 @@ void Game::chooseMode() {
 			startLocalGame(kDown);
 		} else{
 
-			gfx->setGameMode(CLASSIC_MODE);
+			gfx->showPieceOnPlayTopScreen();
 			showScore();
 
 			gfx->renderBotScreen();
@@ -312,6 +316,11 @@ void Game::chooseMode() {
 		
 		if(!timerIsSet){
 			startTimer();
+		}
+
+		//	Go back
+		if (kDown & KEY_B) {
+			gameModeOnlineLocal = UNSET;
 		}
 
 		gfx->renderBotScreen();

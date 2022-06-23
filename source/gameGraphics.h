@@ -37,10 +37,10 @@ private:
 	int placedPiecesCnt;
 
 	bool wasXFirst = true;
-	int gameMode;
 	
 
 	Object* pieceOnPlay;
+	Object staticPieceOnPlay;
 
 
 	C3D_RenderTarget* topScreen;
@@ -79,7 +79,6 @@ public:
 	void moveCursorToPlace(int index);
 	void setPieceBackground(int index, int background);
 
-	void setGameMode(int gameMode);
 	void showPieceOnPlayTopScreen();
 
 
